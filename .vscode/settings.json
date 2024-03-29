@@ -1,0 +1,6 @@
+{
+    "cmake.configureEnvironment": {
+        "DynamoRIO_DIR": "${workspaceFolder}/third_party/dynamorio/build/cmake"
+    },
+    "cmake.ignoreKitEnv": false,
+}
