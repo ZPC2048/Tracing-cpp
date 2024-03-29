@@ -3,4 +3,7 @@
         "DynamoRIO_DIR": "${workspaceFolder}/third_party/dynamorio/build/cmake"
     },
     "cmake.ignoreKitEnv": false,
+    "C_Cpp.default.compilerPath": "/usr/bin/g++",
+    "editor.tabSize": 2,
+    "C_Cpp.clang_format_fallbackStyle": "Google"
 }
