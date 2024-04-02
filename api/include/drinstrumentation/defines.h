@@ -9,4 +9,6 @@ using uint64 = unsigned long int;
 using uint32 = unsigned int;
 using uint8 = unsigned char;
 
+using pointer = unsigned char*;
+
 }  // namespace drinstrumentation

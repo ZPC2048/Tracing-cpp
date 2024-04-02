@@ -11,12 +11,14 @@ class Instrumentation final
  public:
   Instrumentation(std::shared_ptr<checker::Checker> checker);
 
-  virtual const std::vector<symbol::Symbol>& get_instrumentation_point();
+  void tryToInsertTracerInto(symbol::Symbol) override;
 
-  virtual void insert_instrumentation_point(symbol::Symbol point);
+  static void prehookFunc(void *wrapcxt, void **user_data);
 
- protected:
-  std::vector<symbol::Symbol> instrumentation_point_;
+  static void posthookFunc(void *wrapcxt, void *user_data);
+
+ private:
+  std::shared_ptr<checker::Checker> checker_;
 };
 
 }  // namespace instrumentation

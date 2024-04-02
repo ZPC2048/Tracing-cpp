@@ -7,7 +7,7 @@ namespace checker {
 
 class Checker {
  public:
-  virtual bool check_instrumentation_point(symbol::Symbol symbol) = 0;
+  virtual bool shouldInstrumentSymbol(symbol::Symbol symbol) = 0;
 };
 
 }  // namespace checker

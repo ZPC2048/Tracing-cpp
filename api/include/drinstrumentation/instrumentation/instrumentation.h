@@ -11,15 +11,7 @@ namespace instrumentation {
 
 class Instrumentation {
  public:
-  Instrumentation(std::shared_ptr<checker::Checker> checker)
-      : checker_(checker) {}
-
-  virtual const std::vector<symbol::Symbol>& get_instrumentation_point() = 0;
-
-  virtual void insert_instrumentation_point(symbol::Symbol point) = 0;
-
- protected:
-  std::shared_ptr<checker::Checker> checker_;
+  virtual void tryToInsertTracerInto(symbol::Symbol) = 0;
 };
 
 }  // namespace instrumentation

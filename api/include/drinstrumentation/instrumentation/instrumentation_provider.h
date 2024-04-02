@@ -32,8 +32,7 @@ class InstrumentationProvider {
  private:
   static std::shared_ptr<Instrumentation>& GetInstrumentation() {
     static std::shared_ptr<Instrumentation> instrumentation(
-        new NoopInstrumentation(
-            std::make_shared<checker::Checker>(new NoopChecker)));
+        new NoopInstrumentation());
     return instrumentation;
   }
 };

@@ -9,21 +9,14 @@ namespace drinstrumentation {
 
 class NoopChecker final : public checker::Checker {
  public:
-  virtual bool check_instrumentation_point(symbol::Symbol symbol) {
-    return true;
-  }
+  bool shouldInstrumentSymbol(symbol::Symbol symbol) override { return true; }
 };
 
 class NoopInstrumentation final : public instrumentation::Instrumentation {
  public:
-  NoopInstrumentation(std::shared_ptr<checker::Checker> checker)
-      : instrumentation::Instrumentation(checker) {}
+  NoopInstrumentation() {}
 
-  virtual const std::vector<symbol::Symbol>& get_instrumentation_point() {
-    return std::vector<symbol::Symbol>{};
-  }
-
-  virtual void insert_instrumentation_point(symbol::Symbol) {}
+  void tryToInsertTracerInto(symbol::Symbol) override {}
 };
 
 class NoopSpan final : public trace::Span {

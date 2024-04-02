@@ -4,6 +4,7 @@
 
 #include "dr_api.h"
 #include "drcallstack.h"
+#include "drinstrumentation/defines.h"
 #include "drinstrumentation/instrumentation/instrumentation.h"
 #include "drmgr.h"
 #include "droption.h"
@@ -13,6 +14,11 @@
 namespace drinstrumentation {
 
 static std::shared_ptr<instrumentation::Instrumentation> ptr;
+
+struct PassToEnumerateSymbols {
+  const char* module_name;
+  pointer start_pos;
+};
 
 static bool enumerate_symbols(drsym_info_t* info, drsym_error_t status,
                               void* data) {
@@ -26,18 +32,21 @@ static bool enumerate_symbols(drsym_info_t* info, drsym_error_t status,
   drsym_demangle_symbol(full_demangle_name, 500, info->name,
                         DRSYM_DEMANGLE_FULL);
 
-  ptr->insert_instrumentation_point(symbol::Symbol{
-      info->file, (char*)data, info->line, info->line_offs, info->start_offs,
-      info->end_offs, info->name, demangled_name, full_demangle_name});
+  PassToEnumerateSymbols* module_data = (PassToEnumerateSymbols*)data;
+  ptr->tryToInsertTracerInto(symbol::Symbol{
+      info->file, module_data->module_name, info->line, info->line_offs,
+      module_data->start_pos, info->start_offs, info->end_offs, info->name,
+      demangled_name, full_demangle_name});
 
   return true;
 }
 
 static void module_load(void* drcontext, const module_data_t* info,
                         bool loaded) {
-  drsym_enumerate_symbols_ex(
-      info->full_path, enumerate_symbols, sizeof(drsym_info_t),
-      (void*)info->names.module_name, DRSYM_LEAVE_MANGLED);
+  PassToEnumerateSymbols data{info->names.module_name, info->start};
+  drsym_enumerate_symbols_ex(info->full_path, enumerate_symbols,
+                             sizeof(drsym_info_t), (void*)&data,
+                             DRSYM_LEAVE_MANGLED);
 }
 
 bool init_client(

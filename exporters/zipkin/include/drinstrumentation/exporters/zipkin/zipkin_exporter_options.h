@@ -3,6 +3,9 @@
 #include <map>
 #include <string>
 
+namespace drinstrumentation {
+namespace exporter {
+
 struct ZipkinExporterOptions {
   // The endpoint to export to. By default the OpenTelemetry Collector's default
   // endpoint.
@@ -13,3 +16,6 @@ struct ZipkinExporterOptions {
   std::map<std::string, std::string> headers = {
       {"content-type", "application/json"}};
 };
+
+}  // namespace exporter
+}  // namespace drinstrumentation

@@ -8,7 +8,7 @@ namespace trace {
 
 class SpanExporter {
  public:
-  void Export(drinstrumentation::trace::SpanContext context);
+  virtual void Export(drinstrumentation::trace::SpanContext context) = 0;
 };
 
 }  // namespace trace

@@ -21,6 +21,9 @@ struct Symbol {
   /** offset from address that starts at line */
   size_t line_offs;
 
+  /** module base pointer */
+  pointer module_start;
+
   /** offset from module base of start of symbol. */
   size_t start_offs;
 
