@@ -19,8 +19,6 @@ class Instrumentation final
   std::vector<symbol::Symbol> instrumentation_point_;
 };
 
-
-
 }  // namespace instrumentation
 }  // namespace sdk
 }  // namespace drinstrumentation
