@@ -70,6 +70,8 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "cfenv": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "optional": "cpp",
+        "shared_mutex": "cpp"
     }
 }
