@@ -21,9 +21,12 @@ class NoopInstrumentation final : public instrumentation::Instrumentation {
 
 class NoopSpan final : public trace::Span {
  public:
+  const trace::SpanContext& getContext() override {
+    return trace::SpanContext::getInvalid();
+  }
   void setAttribute(std::string key, std::string value) override {}
-
   void End() override {}
+  std::string getSpanJson() const override { return ""; }
 };
 
 class NoopTracer final : public trace::Tracer {

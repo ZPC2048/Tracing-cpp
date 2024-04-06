@@ -36,7 +36,7 @@ class RuntimeContextStorage {
   virtual Context getCurrent() = 0;
   virtual std::unique_ptr<Token> attach(const Context&) = 0;
   virtual bool detach(Token& token) = 0;
-  virtual ~RuntimeContextStorage() = 0;
+  virtual ~RuntimeContextStorage() = default;
 };
 
 /**
@@ -102,8 +102,6 @@ class DefaultRuntimeContextStorage : public RuntimeContextStorage {
     }
     return false;
   }
-
-  ~DefaultRuntimeContextStorage() override {}
 
  private:
   bool hasContext(Token& token) {

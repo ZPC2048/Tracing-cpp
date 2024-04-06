@@ -11,8 +11,9 @@ namespace trace {
 
 class SimplySpanProcessor : public SpanProcessor {
  public:
-  void onStart() override;
-  void onEnd(drinstrumentation::trace::SpanContext context) override;
+  SimplySpanProcessor(std::unique_ptr<SpanExporter>&& exporter);
+  ~SimplySpanProcessor() override;
+  void onEnd(const drinstrumentation::trace::Span& span) override;
 
  private:
   std::unique_ptr<SpanExporter> exporter_;

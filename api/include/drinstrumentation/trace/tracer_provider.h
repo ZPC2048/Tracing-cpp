@@ -10,6 +10,7 @@ namespace trace {
 
 class TracerProvider {
  public:
+  virtual ~TracerProvider() = default;
   virtual std::shared_ptr<Tracer> getTracer(std::string name) = 0;
 };
 

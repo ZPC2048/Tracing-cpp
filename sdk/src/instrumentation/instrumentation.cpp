@@ -1,6 +1,9 @@
 #include "sdk/drinstrumentation/instrumentation/instrumentation.h"
 
 #include "dr_api.h"
+#include "drinstrumentation/trace/provider.h"
+#include "drinstrumentation/trace/scope.h"
+#include "drinstrumentation/trace/span.h"
 #include "drwrap.h"
 
 namespace drinstrumentation {
@@ -18,11 +21,14 @@ void Instrumentation::tryToInsertTracerInto(symbol::Symbol insertPoint) {
 }
 
 void Instrumentation::prehookFunc(void *wrapcxt, void **user_data) {
-
+  *user_data = new drinstrumentation::trace::Scope{
+      drinstrumentation::trace::Provider::getTracerProvider()
+          ->getTracer("default")
+          ->startSpan("default")};
 }
 
 void Instrumentation::posthookFunc(void *wrapcxt, void *user_data) {
-  
+  delete (drinstrumentation::trace::Scope *)user_data;
 }
 
 }  // namespace instrumentation

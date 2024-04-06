@@ -5,17 +5,15 @@
 
 namespace drinstrumentation {
 namespace exporter {
+namespace zipkin {
 
 struct ZipkinExporterOptions {
-  // The endpoint to export to. By default the OpenTelemetry Collector's default
-  // endpoint.
-  std::string endpoint = "";  // GetDefaultZipkinEndpoint();
+  std::string endpoint = "http://localhost:9411/api/v2/spans";
   std::string service_name = "default-service";
-  std::string ipv4;
-  std::string ipv6;
   std::map<std::string, std::string> headers = {
       {"content-type", "application/json"}};
 };
 
+}  // namespace zipkin
 }  // namespace exporter
 }  // namespace drinstrumentation

@@ -15,7 +15,7 @@ class Tracer {
  public:
   virtual std::shared_ptr<Span> startSpan(std::string name) = 0;
 
-  virtual ~Tracer() = 0;
+  virtual ~Tracer() = default;
 
   static Scope WithActiveSpan(std::shared_ptr<Span> span) {
     return Scope(span);
