@@ -14,23 +14,32 @@ ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions& options)
     : options_(options) {}
 
 void ZipkinExporter::Export(const drinstrumentation::trace::Span& span) {
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
+  int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (sock == -1) {
     return;
   }
+  addrinfo hints;
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = IPPROTO_TCP;
 
-  hostent* host = gethostbyname("localhost");
-  if (host == nullptr) {
+  addrinfo* res;
+
+  return;
+  if (getaddrinfo("localhost", "9411", &hints, &res) != 0) {
     return;
   }
-
-  sockaddr_in server_addr;
-  memset(&server_addr, 0, sizeof(server_addr));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(9411);
-  inet_aton(host->h_addr_list[0], &server_addr.sin_addr);
-
-  if (connect(sock, (sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+  
+  
+  bool connect_success = false;
+  for (addrinfo* cur = res; cur != nullptr; cur = cur->ai_next){
+    if (connect(sock, cur->ai_addr, cur->ai_addrlen) != -1){
+      connect_success = true;
+      break;
+    }
+  }
+  if (!connect_success) {
     return;
   }
 
@@ -43,10 +52,9 @@ void ZipkinExporter::Export(const drinstrumentation::trace::Span& span) {
       "Content-Length: " +
       std::to_string(payload.length()) + "\r\n\r\n" + payload;
 
-  if (send(sock, post_request.c_str(), post_request.length(), 0) == -1) {
-    return;
-  }
+  send(sock, post_request.c_str(), post_request.length(), 0);
 
+  freeaddrinfo(res);
   close(sock);
 }
 
