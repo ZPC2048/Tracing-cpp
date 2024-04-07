@@ -16,7 +16,7 @@ Span::Span(std::shared_ptr<Tracer> tracer, std::string name,
 
 Span::~Span() { End(); }
 
-const drinstrumentation::trace::SpanContext& Span::getContext() {
+const drinstrumentation::trace::SpanContext Span::getContext() {
   return *span_context_;
 }
 

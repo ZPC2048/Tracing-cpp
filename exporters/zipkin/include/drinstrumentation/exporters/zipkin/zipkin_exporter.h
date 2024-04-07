@@ -1,7 +1,7 @@
 #pragma once
 
 #include "drinstrumentation/exporters/zipkin/zipkin_exporter_options.h"
-#include "drinstrumentation/trace/exporter.h"
+#include "sdk/drinstrumentation/trace/exporter.h"
 
 namespace drinstrumentation {
 namespace exporter {
@@ -10,7 +10,7 @@ namespace zipkin {
 class ZipkinExporter final
     : public drinstrumentation::sdk::trace::SpanExporter {
  public:
-  ZipkinExporter(const ZipkinExporterOptions& options);
+  ZipkinExporter(const ZipkinExporterOptions& options = {});
   void Export(const drinstrumentation::trace::Span& span) override;
 
  private:

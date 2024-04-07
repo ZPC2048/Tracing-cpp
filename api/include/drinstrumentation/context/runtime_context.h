@@ -8,6 +8,8 @@
 namespace drinstrumentation {
 namespace context {
 
+class RuntimeContext;
+
 /**
  * The Token object is returned when attaching context to the
  * RuntimeContext object and is associated with the attached context, and can be
@@ -18,7 +20,7 @@ class Token {
  public:
   Token(const Context& context) : context_(context) {}
 
-  ~Token() { RuntimeContext::detach(*this); }
+  ~Token();
 
   bool operator==(const Context& other) const {
     return other == this->context_;
@@ -37,36 +39,6 @@ class RuntimeContextStorage {
   virtual std::unique_ptr<Token> attach(const Context&) = 0;
   virtual bool detach(Token& token) = 0;
   virtual ~RuntimeContextStorage() = default;
-};
-
-/**
- * Provides a wrapper for propagating the context object globally.
- */
-class RuntimeContext {
- public:
-  static void setRuntimeContextStorage(
-      std::shared_ptr<RuntimeContextStorage> context_storage) {
-    getRuntimeContextStorage() = context_storage;
-  }
-
-  static Context getCurrent() {
-    return getRuntimeContextStorage()->getCurrent();
-  }
-
-  static std::unique_ptr<Token> attach(const Context& context) {
-    return getRuntimeContextStorage()->attach(context);
-  }
-
-  static bool detach(Token& token) {
-    return getRuntimeContextStorage()->detach(token);
-  }
-
- private:
-  static std::shared_ptr<RuntimeContextStorage>& getRuntimeContextStorage() {
-    static std::shared_ptr<RuntimeContextStorage> context_storage_(
-        new DefaultRuntimeContextStorage);
-    return context_storage_;
-  }
 };
 
 class DefaultRuntimeContextStorage : public RuntimeContextStorage {
@@ -115,6 +87,38 @@ class DefaultRuntimeContextStorage : public RuntimeContextStorage {
 
   std::vector<Context> stack_;
 };
+
+/**
+ * Provides a wrapper for propagating the context object globally.
+ */
+class RuntimeContext {
+ public:
+  static void setRuntimeContextStorage(
+      std::shared_ptr<RuntimeContextStorage> context_storage) {
+    getRuntimeContextStorage() = context_storage;
+  }
+
+  static Context getCurrent() {
+    return getRuntimeContextStorage()->getCurrent();
+  }
+
+  static std::unique_ptr<Token> attach(const Context& context) {
+    return getRuntimeContextStorage()->attach(context);
+  }
+
+  static bool detach(Token& token) {
+    return getRuntimeContextStorage()->detach(token);
+  }
+
+ private:
+  static std::shared_ptr<RuntimeContextStorage>& getRuntimeContextStorage() {
+    static std::shared_ptr<RuntimeContextStorage> context_storage_(
+        new DefaultRuntimeContextStorage);
+    return context_storage_;
+  }
+};
+
+Token::~Token() { RuntimeContext::detach(*this); }
 
 }  // namespace context
 }  // namespace drinstrumentation

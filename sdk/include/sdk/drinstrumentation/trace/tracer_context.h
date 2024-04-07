@@ -12,9 +12,9 @@ namespace trace {
 
 class TracerContext {
  public:
-  explicit TracerContext(std::unique_ptr<Sampler> sampler,
-                         std::unique_ptr<IdGenerator> id_generator,
-                         std::unique_ptr<SpanProcessor> processor);
+  explicit TracerContext(std::unique_ptr<Sampler>&& sampler,
+                         std::unique_ptr<IdGenerator>&& id_generator,
+                         std::unique_ptr<SpanProcessor>&& processor);
 
   Sampler& getSampler() const;
   IdGenerator& getIdGenerator() const;

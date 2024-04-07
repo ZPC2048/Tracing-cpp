@@ -4,7 +4,7 @@ namespace drinstrumentation {
 namespace sdk {
 namespace checker {
 
-bool Checker::check_instrumentation_point(symbol::Symbol symbol) {
+bool Checker::shouldInstrumentSymbol(symbol::Symbol symbol) {
   if (module_blacklist.find(symbol.module_name) != module_blacklist.end()) {
     return false;
   }

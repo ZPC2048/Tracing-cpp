@@ -12,7 +12,7 @@ namespace checker {
 
 class Checker final : public drinstrumentation::checker::Checker {
  public:
-  virtual bool check_instrumentation_point(symbol::Symbol symbol);
+  virtual bool shouldInstrumentSymbol(symbol::Symbol symbol) override;
 
  private:
   static const std::unordered_set<std::string> module_blacklist;

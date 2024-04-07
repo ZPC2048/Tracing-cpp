@@ -1,16 +1,11 @@
 #include "sdk/drinstrumentation/instrumentation/instrumentation.h"
 
-#include "dr_api.h"
-#include "drinstrumentation/trace/provider.h"
-#include "drinstrumentation/trace/scope.h"
-#include "drinstrumentation/trace/span.h"
-#include "drwrap.h"
-
 namespace drinstrumentation {
 namespace sdk {
 namespace instrumentation {
 
-Instrumentation::Instrumentation(std::shared_ptr<checker::Checker> checker)
+Instrumentation::Instrumentation(
+    std::shared_ptr<drinstrumentation::checker::Checker> checker)
     : checker_(checker) {}
 
 void Instrumentation::tryToInsertTracerInto(symbol::Symbol insertPoint) {

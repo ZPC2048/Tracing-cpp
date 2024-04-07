@@ -1,0 +1,3 @@
+add_subdirectory(checker)
+add_subdirectory(instrumentation)
+add_subdirectory(trace)

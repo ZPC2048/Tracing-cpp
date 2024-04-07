@@ -1,5 +1,3 @@
-#pragma once
-
 #include "sdk/drinstrumentation/trace/tracer.h"
 
 #include "sdk/drinstrumentation/trace/span.h"

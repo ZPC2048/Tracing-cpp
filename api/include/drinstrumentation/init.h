@@ -3,11 +3,9 @@
 #include <memory>
 
 #include "dr_api.h"
-#include "drcallstack.h"
 #include "drinstrumentation/defines.h"
 #include "drinstrumentation/instrumentation/instrumentation.h"
 #include "drmgr.h"
-#include "droption.h"
 #include "drsyms.h"
 #include "drwrap.h"
 
