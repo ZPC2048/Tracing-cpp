@@ -8,7 +8,7 @@ namespace trace {
 
 class Sampler {
  public:
-  virtual ~Sampler() = 0;
+  virtual ~Sampler() = default;
   virtual bool shouldSample(const drinstrumentation::trace::SpanContext&) = 0;
 };
 

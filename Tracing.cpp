@@ -17,10 +17,10 @@ DR_EXPORT void dr_client_main(client_id_t id, int argc, const char *argv[]) {
 
   std::shared_ptr<drinstrumentation::sdk::trace::TracerContext> context{
       new drinstrumentation::sdk::trace::TracerContext{
-          std::unique_ptr<drinstrumentation::sdk::trace::Sampler>(
-              new drinstrumentation::sdk::trace::AlwaysOnSampler),
-          std::unique_ptr<drinstrumentation::sdk::trace::IdGenerator>(
-              new drinstrumentation::sdk::trace::RandomIdGenerator),
+          std::move(std::unique_ptr<drinstrumentation::sdk::trace::Sampler>(
+              new drinstrumentation::sdk::trace::AlwaysOnSampler)),
+          std::move(std::unique_ptr<drinstrumentation::sdk::trace::IdGenerator>(
+              new drinstrumentation::sdk::trace::RandomIdGenerator)),
           std::move(processor)}};
 
   std::shared_ptr<drinstrumentation::sdk::trace::TracerProvider> provider{

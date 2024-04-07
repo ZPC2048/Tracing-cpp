@@ -8,6 +8,7 @@ namespace trace {
 
 class AlwaysOnSampler : public Sampler {
  public:
+  AlwaysOnSampler() = default;
   ~AlwaysOnSampler() override;
   bool shouldSample(
       const drinstrumentation::trace::SpanContext& span_context) override;

@@ -8,8 +8,6 @@
 namespace drinstrumentation {
 namespace context {
 
-class RuntimeContext;
-
 /**
  * The Token object is returned when attaching context to the
  * RuntimeContext object and is associated with the attached context, and can be
@@ -118,7 +116,7 @@ class RuntimeContext {
   }
 };
 
-Token::~Token() { RuntimeContext::detach(*this); }
+inline Token::~Token() { RuntimeContext::detach(*this); }
 
 }  // namespace context
 }  // namespace drinstrumentation

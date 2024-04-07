@@ -11,15 +11,22 @@ use_DynamoRIO_extension(Tracing drmgr)
 use_DynamoRIO_extension(Tracing drwrap)
 use_DynamoRIO_extension(Tracing drsyms)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include_directories(api/include)
 add_subdirectory(api)
 
 include_directories(sdk/include)
 add_subdirectory(sdk)
+
+include_directories(exporters/zipkin/include)
 add_subdirectory(exporters)
 
 target_link_libraries(
-  Tracing 
+  Tracing
   tracing_api
-  tracing_sdk
-  tracing_exporter_zipkin)
+  tracing_checker
+  tracing_instrumentation
+  tracing_trace
+  tracing_exporter_zipkin
+)
