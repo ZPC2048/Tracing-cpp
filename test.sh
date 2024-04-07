@@ -1,0 +1,1 @@
+./third_party/dynamorio/build/bin64/drrun -c ./build/libTracing.so -- ../application.out

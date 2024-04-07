@@ -32,10 +32,10 @@ static bool enumerate_symbols(drsym_info_t* info, drsym_error_t status,
 
   PassToEnumerateSymbols* module_data = (PassToEnumerateSymbols*)data;
   ptr->tryToInsertTracerInto(symbol::Symbol{
-      info->file, module_data->module_name ? module_data->module_name : "",
-      info->line, info->line_offs, module_data->start_pos, info->start_offs,
-      info->end_offs, info->name ? info->name : "", demangled_name,
-      full_demangle_name});
+      info->file ? info->file : "",
+      module_data->module_name ? module_data->module_name : "", info->line,
+      info->line_offs, module_data->start_pos, info->start_offs, info->end_offs,
+      info->name ? info->name : "", demangled_name, full_demangle_name});
 
   return true;
 }

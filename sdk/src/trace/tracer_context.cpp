@@ -4,11 +4,11 @@ namespace drinstrumentation {
 namespace sdk {
 namespace trace {
 
-TracerContext::TracerContext(std::unique_ptr<Sampler>&& sampler,
-                             std::unique_ptr<IdGenerator>&& id_generator,
-                             std::unique_ptr<SpanProcessor>&& processor)
+TracerContext::TracerContext(std::unique_ptr<Sampler> sampler,
+                             std::unique_ptr<IdGenerator> id_generator,
+                             std::unique_ptr<SpanProcessor> processor)
     : sampler_(std::move(sampler)),
-      id_generator_(std::move(id_generator_)),
+      id_generator_(std::move(id_generator)),
       processor_(std::move(processor)) {}
 
 Sampler& TracerContext::getSampler() const { return *sampler_; }
