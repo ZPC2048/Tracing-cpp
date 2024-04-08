@@ -19,32 +19,41 @@ void Instrumentation::tryToInsertTracerInto(symbol::Symbol insertPoint) {
     // DEBUG
     // dr_fprintf(STDERR, "insertPoint: %s", insertPoint.demangled_name.data());
 
+    std::string *func_name = new std::string(insertPoint.full_demangled_name);
     drwrap_wrap_ex(insertPoint.module_start + insertPoint.start_offs,
-                   prehookFunc, posthookFunc, nullptr, 0);
+                   prehookFunc, posthookFunc, func_name, 0);
   }
 }
 
 void Instrumentation::prehookFunc(void *wrapcxt, void **user_data) {
   // DEBUG
-  dr_fprintf(STDERR, "prehookFunc Begin\n");
+  // dr_fprintf(STDERR, "get arg %d: %\n");
+  std::string func_name = *(std::string *)*user_data;
 
-  *user_data = new drinstrumentation::trace::Scope{
+  std::shared_ptr<drinstrumentation::trace::Span> span =
       drinstrumentation::trace::Provider::getTracerProvider()
           ->getTracer("default")
-          ->startSpan("default")};
-          
+          ->startSpan(func_name);
+
+  if (span->getContext().getTraceState()->empty()) {
+    span->getContext().getTraceState()->set("serviceName", "default_service");
+    span->getContext().getTraceState()->set("ipv4", "127.0.0.1");
+  }
+
+  *user_data = new drinstrumentation::trace::Scope{span};
+
   // DEBUG
-  dr_fprintf(STDERR, "prehookFunc End\n");
+  // dr_fprintf(STDERR, "prehookFunc End\n");
 }
 
 void Instrumentation::posthookFunc(void *wrapcxt, void *user_data) {
   // DEBUG
-  dr_fprintf(STDERR, "posthookFunc Begin\n");
+  // dr_fprintf(STDERR, "posthookFunc Begin\n");
 
   delete (drinstrumentation::trace::Scope *)user_data;
 
   // DEBUG
-  dr_fprintf(STDERR, "posthookFunc End\n");
+  // dr_fprintf(STDERR, "posthookFunc End\n");
 }
 
 }  // namespace instrumentation
