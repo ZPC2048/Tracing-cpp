@@ -50,7 +50,7 @@ std::string Span::getSpanJson() const {
   json += "[{";
   json +=
       getKeyValuJson("id", span_context_->getSpanId().toLowerBase16()) + ",";
-  json += getKeyValuJson("trace", span_context_->getTraceId().toLowerBase16()) +
+  json += getKeyValuJson("traceId", span_context_->getTraceId().toLowerBase16()) +
           ",";
   if (parent_id_.isValid()) {
     json += getKeyValuJson("parentId", parent_id_.toLowerBase16()) + ",";
@@ -60,9 +60,9 @@ std::string Span::getSpanJson() const {
     json += "tags:" + getMapJson(attribute_) + ",";
   }
   std::string service_name, service_addr;
-  if (getContext().getTraceState()->get("serviceName", service_name) ||
+  if (getContext().getTraceState()->get("serviceName", service_name) &&
       getContext().getTraceState()->get("ipv4", service_addr)) {
-    json += "localEndpoint:{" + getKeyValuJson("serviceName", service_name) +
+    json += "\"localEndpoint\":{" + getKeyValuJson("serviceName", service_name) +
             "," + getKeyValuJson("ipv4", service_addr) + "},";
   }
   json += getKeyValuJson(
