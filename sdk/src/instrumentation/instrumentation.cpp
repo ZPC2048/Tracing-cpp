@@ -1,4 +1,5 @@
 #include "sdk/drinstrumentation/instrumentation/instrumentation.h"
+
 #include "sdk/drinstrumentation/trace/span.h"
 
 namespace drinstrumentation {
@@ -25,9 +26,6 @@ void Instrumentation::tryToInsertTracerInto(symbol::Symbol insertPoint) {
   //            insertPoint.demangled_name.data());
 
   if (checker_->shouldInstrumentSymbol(insertPoint)) {
-    // DEBUG
-    // dr_fprintf(STDERR, "insertPoint: %s", insertPoint.demangled_name.data());
-
     drwrap_wrap_ex(insertPoint.module_start + insertPoint.start_offs,
                    prehookFunc, posthookFunc,
                    new DataBetweenPreAndPost{insertPoint.full_demangled_name,
@@ -37,66 +35,100 @@ void Instrumentation::tryToInsertTracerInto(symbol::Symbol insertPoint) {
 }
 
 void Instrumentation::prehookFunc(void *wrapcxt, void **user_data) {
-  // DEBUG
-  // dr_fprintf(STDERR, "get arg %d: %\n");
-  DataBetweenPreAndPost* data = (DataBetweenPreAndPost*)*user_data;
+  DataBetweenPreAndPost *data = (DataBetweenPreAndPost *)*user_data;
   std::string func_name = data->func_name;
 
   if (func_name.find("Post") != std::string::npos) {
     std::shared_ptr<drinstrumentation::trace::Span> span =
         drinstrumentation::trace::Provider::getTracerProvider()
             ->getTracer("default")
-            ->startSpan(func_name);
+            ->startSpan(func_name,
+                        drinstrumentation::trace::SpanContext::getInvalid());
 
     std::string *origin = new std::string((char *)drwrap_get_arg(wrapcxt, 1));
     int pos = origin->find("\r\n\r\n");
-    origin->insert(
-        pos, "\r\nParentId: " + span->getContext().getSpanId().toLowerBase16());
-    origin->insert(
-        pos, "\r\nTraceId: " + span->getContext().getTraceId().toLowerBase16());
+    origin->insert(pos, "\r\nParent-Id: " +
+                            span->getContext().getSpanId().toLowerBase16());
+    origin->insert(pos, "\r\nTrace-Id: " +
+                            span->getContext().getTraceId().toLowerBase16());
+    origin->insert(pos, "\r\nIs-Sampled: " +
+                            std::to_string(span->getContext().isSampled()));
     drwrap_set_arg(wrapcxt, 1, (void *)origin->data());
     drwrap_set_arg(wrapcxt, 2, (void *)origin->length());
 
-    span->getContext().getTraceState()->set("serviceName", "client_service");
-    span->getContext().getTraceState()->set("ipv4", "127.0.0.1");
-
     if (span->getContext().getTraceState()->empty()) {
-      span->getContext().getTraceState()->set("serviceName", "default_service");
+      span->getContext().getTraceState()->set("serviceName", "client_service");
       span->getContext().getTraceState()->set("ipv4", "127.0.0.1");
     }
 
     data->scope = new drinstrumentation::trace::Scope{span};
   } else if (func_name.find("receive") != std::string::npos) {
-    std::shared_ptr<drinstrumentation::trace::Span> span = new drinstrumentation::sdk::trace::Span(drinstrumentation::trace::Provider::getTracerProvider()
-            ->getTracer("default"), "http client", drinstrumentation::trace::SpanId{}, std::unique_ptr<>);
     return;
   } else if (func_name.find("response") != std::string::npos) {
     return;
   }
+}
 
-  // DEBUG
-  // dr_fprintf(STDERR, "prehookFunc End\n");
+// trim from end of string (right)
+static std::string rtrim(std::string s) {
+  static char t[] = " \t\n\r\f\v";
+  s.erase(s.find_last_not_of(t) + 1);
+  return s;
+}
+
+// trim from beginning of string (left)
+static std::string ltrim(std::string s) {
+  static char t[] = " \t\n\r\f\v";
+  s.erase(0, s.find_first_not_of(t));
+  return s;
+}
+
+// trim from both ends of string (right then left)
+static std::string trim(std::string s) { return ltrim(rtrim(s)); }
+
+static std::string getHeaderInfo(std::string &payload, std::string key) {
+  int start_pos = payload.find(':', payload.find(key)) + 1;
+  int end_pos = payload.find("\r\n", start_pos);
+  return trim(payload.substr(start_pos, end_pos - start_pos));
 }
 
 void Instrumentation::posthookFunc(void *wrapcxt, void *user_data) {
-  // DEBUG
-  // dr_fprintf(STDERR, "posthookFunc Begin\n");
-
-  DataBetweenPreAndPost* data = (DataBetweenPreAndPost*)user_data;
+  DataBetweenPreAndPost *data = (DataBetweenPreAndPost *)user_data;
   std::string func_name = data->func_name;
 
   if (func_name.find("Post") != std::string::npos) {
     delete data->scope;
     data->scope = nullptr;
   } else if (func_name.find("receive") != std::string::npos) {
-    
+    std::string *payload = (std::string *)drwrap_get_retval(wrapcxt);
+
+    if (payload->find("Parent-Id") == std::string::npos ||
+        payload->find("Trace-Id") == std::string::npos ||
+        payload->find("Is-Sampled") == std::string::npos) {
+      return;
+    }
+
+    drinstrumentation::trace::SpanContext parent_span{
+        drinstrumentation::trace::TraceId::fromString(
+            getHeaderInfo(*payload, "Trace-Id")),
+        drinstrumentation::trace::SpanId::fromString(
+            getHeaderInfo(*payload, "Parent-Id")),
+        getHeaderInfo(*payload, "Is-Sampled") == "1"};
+    std::shared_ptr<drinstrumentation::trace::Span> span =
+        drinstrumentation::trace::Provider::getTracerProvider()
+            ->getTracer("default")
+            ->startSpan(func_name, parent_span);
+
+    if (span->getContext().getTraceState()->empty()) {
+      span->getContext().getTraceState()->set("serviceName", "server_service");
+      span->getContext().getTraceState()->set("ipv4", "127.0.0.1");
+    }
+
+    *(data->public_scope) = new drinstrumentation::trace::Scope{span};
   } else if (func_name.find("response") != std::string::npos) {
     delete *(data->public_scope);
     *(data->public_scope) = nullptr;
   }
-
-  // DEBUG
-  // dr_fprintf(STDERR, "posthookFunc End\n");
 }
 
 }  // namespace instrumentation

@@ -12,16 +12,20 @@ constexpr int BUFFER_SIZE = 4096;
 std::string receive(int fd) {
   char buffer[BUFFER_SIZE];
   std::string ret;
-  while (true) {
-    int result = read(fd, buffer, BUFFER_SIZE);
-    if (result <= 0) {
-      break;
-    } else {
-      buffer[result] = '\0';
-      ret.append(buffer);
-    }
+  if (read(fd, buffer, BUFFER_SIZE) <= 0) {
+    return "";
   }
-  return ret;
+  return buffer;
+  // while (true) {
+  //   int result = read(fd, buffer, BUFFER_SIZE);
+  //   if (result <= 0) {
+  //     break;
+  //   } else {
+  //     buffer[result] = '\0';
+  //     ret.append(buffer);
+  //   }
+  // }
+  // return ret;
 }
 
 bool response(int fd) {

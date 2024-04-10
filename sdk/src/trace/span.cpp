@@ -29,7 +29,9 @@ void Span::End() {
     return;
   }
   has_ended_ = true;
-  tracer_->getProcessor().onEnd(*this);
+  if (span_context_->isSampled()) {
+    tracer_->getProcessor().onEnd(*this);
+  }
 }
 
 static std::string getKeyValuJson(std::string key, std::string value) {
@@ -50,8 +52,9 @@ std::string Span::getSpanJson() const {
   json += "[{";
   json +=
       getKeyValuJson("id", span_context_->getSpanId().toLowerBase16()) + ",";
-  json += getKeyValuJson("traceId", span_context_->getTraceId().toLowerBase16()) +
-          ",";
+  json +=
+      getKeyValuJson("traceId", span_context_->getTraceId().toLowerBase16()) +
+      ",";
   if (parent_id_.isValid()) {
     json += getKeyValuJson("parentId", parent_id_.toLowerBase16()) + ",";
   }
@@ -62,8 +65,9 @@ std::string Span::getSpanJson() const {
   std::string service_name, service_addr;
   if (getContext().getTraceState()->get("serviceName", service_name) &&
       getContext().getTraceState()->get("ipv4", service_addr)) {
-    json += "\"localEndpoint\":{" + getKeyValuJson("serviceName", service_name) +
-            "," + getKeyValuJson("ipv4", service_addr) + "},";
+    json += "\"localEndpoint\":{" +
+            getKeyValuJson("serviceName", service_name) + "," +
+            getKeyValuJson("ipv4", service_addr) + "},";
   }
   json += getKeyValuJson(
               "timestamp",

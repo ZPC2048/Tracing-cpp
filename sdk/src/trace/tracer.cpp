@@ -11,13 +11,22 @@ Tracer::Tracer(std::shared_ptr<TracerContext> context) : context_(context) {}
 std::shared_ptr<drinstrumentation::trace::Span> Tracer::startSpan(
     std::string name,
     const drinstrumentation::trace::SpanContext& parent_span) {
-      
+  
+  if (parent_span.getTraceId().isValid()) {
+    auto span_context = std::unique_ptr<drinstrumentation::trace::SpanContext>(
+        new drinstrumentation::trace::SpanContext{
+            parent_span.getTraceId(), getIdGenerator().generateSpanId(),
+            parent_span.isSampled(), parent_span.getTraceState()});
+
+    return std::shared_ptr<drinstrumentation::trace::Span>{
+        new Span{shared_from_this(), name, parent_span.getSpanId(),
+                 std::move(span_context)}};
+  }
+
   auto current_span = getCurrentSpan();
 
   bool should_sample = false;
   bool is_parent_span_valid = false;
-
-  if (parent_span)
 
   if (current_span != nullptr) {
     should_sample = current_span->getContext().isSampled();

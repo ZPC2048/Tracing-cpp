@@ -18,12 +18,12 @@ const std::unordered_set<std::string> Checker::file_blacklist{
     "libstdc++.so.6.0.30"};
 
 bool Checker::shouldInstrumentSymbol(symbol::Symbol symbol) {
-  // if (module_blacklist.find(symbol.module_name) != module_blacklist.end()) {
-  //   return false;
-  // }
-  // if (file_blacklist.find(symbol.file_name) != file_blacklist.end()) {
-  //   return false;
-  // }
+  if (module_blacklist.find(symbol.module_name) != module_blacklist.end()) {
+    return false;
+  }
+  if (file_blacklist.find(symbol.file_name) != file_blacklist.end()) {
+    return false;
+  }
 
   // DEBUG
   if (symbol.demangled_name != "Post" &&
