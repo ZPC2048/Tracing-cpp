@@ -15,7 +15,8 @@ class Tracer : public drinstrumentation::trace::Tracer,
   Tracer(std::shared_ptr<TracerContext> context);
 
   std::shared_ptr<drinstrumentation::trace::Span> startSpan(
-      std::string name) override;
+      std::string name,
+      const drinstrumentation::trace::SpanContext& parent_span) override;
 
   SpanProcessor& getProcessor();
 

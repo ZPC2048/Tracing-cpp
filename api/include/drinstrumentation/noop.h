@@ -31,7 +31,8 @@ class NoopSpan final : public trace::Span {
 
 class NoopTracer final : public trace::Tracer {
  public:
-  std::shared_ptr<trace::Span> startSpan(std::string name) override {
+  std::shared_ptr<trace::Span> startSpan(
+      std::string name, const trace::SpanContext& parent_span) override {
     static std::shared_ptr<trace::Span> span_(new NoopSpan);
     return span_;
   }
