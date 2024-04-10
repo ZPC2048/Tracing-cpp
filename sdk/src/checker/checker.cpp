@@ -24,6 +24,13 @@ bool Checker::shouldInstrumentSymbol(symbol::Symbol symbol) {
   if (file_blacklist.find(symbol.file_name) != file_blacklist.end()) {
     return false;
   }
+
+  // DEBUG
+  if (symbol.demangled_name != "Post" &&
+      symbol.demangled_name != "receive" &&
+      symbol.demangled_name != "response") {
+    return false;
+  }
   return true;
 }
 

@@ -13,7 +13,8 @@ namespace trace {
 
 class Tracer {
  public:
-  virtual std::shared_ptr<Span> startSpan(std::string name) = 0;
+  virtual std::shared_ptr<Span> startSpan(
+      std::string name, const SpanContext& parent_span) = 0;
 
   virtual ~Tracer() = default;
 
